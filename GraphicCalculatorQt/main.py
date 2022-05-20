@@ -17,8 +17,8 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.init_x = True
-        self.x0 = 0.1
-        self.x1 = 1.1
+        self.x0 = 1
+        self.x1 = 20
 
         self.setWindowIcon(QtGui.QIcon('calculator.png'))
         self.setWindowTitle("Kalkulator graficzny")
@@ -85,9 +85,10 @@ class MainWindow(QMainWindow):
             print(self.x0, self.x1)
 
             equation = self.label.text()
-            self.UiPlot(equation, self.x0, self.x1)
-            self.init_x = True
 
+            if equation != '':
+                self.UiPlot(equation, self.x0, self.x1)
+            self.init_x = True
 
 
     def UiPlot(self, equation, range_start, range_end):
