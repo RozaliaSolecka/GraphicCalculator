@@ -1,4 +1,6 @@
 import sys
+
+import frange as frange
 import numpy as np
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -6,10 +8,17 @@ from PyQt5.QtCore import *
 from PyQt5 import QtGui
 
 import pyqtgraph as pg
+from frange import drange
+
 
 class MainWindow(QMainWindow):
+
     def __init__(self):
         super().__init__()
+
+        self.init_x = True
+        self.x0 = 0.1
+        self.x1 = 1.1
 
         self.setWindowIcon(QtGui.QIcon('calculator.png'))
         self.setWindowTitle("Kalkulator graficzny")
@@ -49,8 +58,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
 
-        self.plt = pg.plot()
+        self.plt = pg.PlotWidget()
+        self.x = []
+        self.y = []
+        self.plt.sigRangeChanged.connect(self.viewboxChanged)
+
         self.plt.setBackground('w')
+        self.plt.showGrid(x=True, y=True)
         self.graph_layout.addWidget(self.plt)
 
         # calling method
@@ -59,21 +73,46 @@ class MainWindow(QMainWindow):
         # showing all the widgets
         self.show()
 
-    def UiPlot(self, formula):
-        self.graph_layout.removeWidget(self.plt)
+    def viewboxChanged(self, view, range_v):
+        ## range_v[0] will return the list: [x_0, x_1]
+        self.x0 = range_v[0][0]
+        self.x1 = range_v[0][1]
+
+        if self.init_x:
+            self.init_x = False
+            pass
+        else:
+            print(self.x0, self.x1)
+
+            equation = self.label.text()
+            self.UiPlot(equation, self.x0, self.x1)
+            self.init_x = True
 
 
-        x = np.array(range(0, 100))
-        y = []
-        for i in x:
-            result = eval(formula, {"x": i})
-            y.append(result)
-        self.plt = pg.plot()
-        self.plt.setBackground('w')
-        self.plt.plot(x, y)
 
-        self.graph_layout.addWidget(self.plt)
+    def UiPlot(self, equation, range_start, range_end):
 
+        self.plt.clear()
+
+        self.x = list(drange(range_start, range_end, 0.1))
+        self.y = []
+        for i in self.x:
+            result = eval(equation, {"x": i})
+            self.y.append(result)
+
+        self.plt.showGrid(x=True, y=True)
+        pen = pg.mkPen(color=(255, 0, 0))
+
+        try:
+            self.plt.plot(self.x, self.y, pen = pen)
+            self.init_x = False
+        except:
+            self.init_x = False
+            self.plt.clear()
+            self.plt.showGrid(x=True, y=True)
+            self.plt.setBackground('w')
+
+            self.label.setText("Błąd")
 
     # method for widgets
 
@@ -230,41 +269,40 @@ class MainWindow(QMainWindow):
         # endRange = self.labelEndVal.text()
 
         try:
-            self.UiPlot(equation)
+            self.UiPlot(equation, self.x0, self.x1)
 
         except:
             # setting text to the label
-            self.graph_layout.removeWidget(self.plt)
-            self.plt = pg.plot()
+            self.plt.clear()
+            self.plt.showGrid(x=True, y=True)
             self.plt.setBackground('w')
-            self.graph_layout.addWidget(self.plt)
 
             self.label.setText("Błąd")
 
     def action_x(self):
         # appending label text
         text = self.label.text()
-        self.label.setText(text + " x ")
+        self.label.setText(text + "x")
 
     def action_plus(self):
         # appending label text
         text = self.label.text()
-        self.label.setText(text + " + ")
+        self.label.setText(text + "+")
 
     def action_minus(self):
         # appending label text
         text = self.label.text()
-        self.label.setText(text + " - ")
+        self.label.setText(text + "-")
 
     def action_div(self):
         # appending label text
         text = self.label.text()
-        self.label.setText(text + " / ")
+        self.label.setText(text + "/")
 
     def action_mul(self):
         # appending label text
         text = self.label.text()
-        self.label.setText(text + " * ")
+        self.label.setText(text + "*")
 
     def action_point(self):
         # appending label text
@@ -346,6 +384,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = MainWindow()
+
+
     window.show()
 
     app.exec()
