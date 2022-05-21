@@ -8,7 +8,6 @@ from PyQt5 import QtGui
 import pyqtgraph as pg
 from frange import drange
 
-
 class MainWindow(QMainWindow):
 
     def __init__(self):
