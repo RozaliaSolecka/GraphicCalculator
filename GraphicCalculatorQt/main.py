@@ -7,6 +7,7 @@ from PyQt5 import QtGui
 
 import pyqtgraph as pg
 from frange import drange
+import sympy as sp
 
 class MainWindow(QMainWindow):
 
@@ -14,7 +15,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.init_x = True
-        self.x0 = 1
+        self.x0 = -20
         self.x1 = 20
 
         self.setWindowIcon(QtGui.QIcon('calculator.png'))
@@ -87,6 +88,8 @@ class MainWindow(QMainWindow):
                 self.UiPlot(equation, self.x0, self.x1)
             self.init_x = True
 
+    def checkifcontinus(self, func, x, symbol):
+        return (sp.limit(func, symbol, x).is_real)
 
     def UiPlot(self, equation, range_start, range_end):
 
@@ -94,6 +97,7 @@ class MainWindow(QMainWindow):
 
         self.x = list(drange(range_start, range_end, 0.1))
         self.y = []
+
         for i in self.x:
             result = eval(equation, {"x": i})
             self.y.append(result)
