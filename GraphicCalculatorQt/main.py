@@ -35,21 +35,21 @@ class MainWindow(QMainWindow):
         self.panel_layout = QHBoxLayout()
         self.graph_layout = QHBoxLayout()
         self.row_1 = QHBoxLayout()
-        #self.row_1_2 = QHBoxLayout()
         self.row_2 = QHBoxLayout()
         self.row_3 = QHBoxLayout()
         self.row_4 = QHBoxLayout()
         self.row_5 = QHBoxLayout()
+        self.row_6 = QHBoxLayout()
 
         self.pagelayout.addLayout(self.graph_layout)
         self.pagelayout.addLayout(self.panel_layout)
         self.pagelayout.addLayout(self.button_layout)
         self.pagelayout.addLayout(self.row_1)
-        #self.pagelayout.addLayout(self.row_1_2)
         self.pagelayout.addLayout(self.row_2)
         self.pagelayout.addLayout(self.row_3)
         self.pagelayout.addLayout(self.row_4)
         self.pagelayout.addLayout(self.row_5)
+        self.pagelayout.addLayout(self.row_6)
 
         widget = QWidget()
         widget.setLayout(self.pagelayout)
@@ -88,8 +88,8 @@ class MainWindow(QMainWindow):
                 self.UiPlot(equation, self.x0, self.x1)
             self.init_x = True
 
-    def checkifcontinus(self, func, x, symbol):
-        return (sp.limit(func, symbol, x).is_real)
+    # def checkifcontinus(self, func, x, symbol):
+    #     return (sp.limit(func, symbol, x).is_real)
 
     def UiPlot(self, equation, range_start, range_end):
 
@@ -187,41 +187,18 @@ class MainWindow(QMainWindow):
         push_point = QPushButton(".", self)
         # clear button
         push_clear = QPushButton("Wyczyść", self)
-        # clear button
-        #push_clear_ranges = QPushButton("Wyczyść zakresy", self)
         # del one character button
         push_del = QPushButton("Usuń", self)
 
-        # # start range label
-        # labelStart = QLabel('Zakres x od = ', self)
-        # self.row_1_2.addWidget(labelStart, 1)
-        #
-        # # creating a label
-        # self.labelStartVal = QLabel(self)
-        # # setting style sheet to the label
-        # self.labelStartVal.setStyleSheet("QLabel"
-        #                          "{"
-        #                          "border : 1px solid black;"
-        #                          "background : white;"
-        #                          "}")
-        # self.labelStartVal.setText("0")
-        # self.row_1_2.addWidget(self.labelStartVal, 1)
-        #
-        # # end range label
-        # labelEnd = QLabel('Zakres x do = ', self)
-        # self.row_1_2.addWidget(labelEnd, 1)
-        #
-        # # creating a label
-        # self.labelEndVal = QLabel(self)
-        # # setting style sheet to the label
-        # self.labelEndVal.setStyleSheet("QLabel"
-        #                                  "{"
-        #                                  "border : 1px solid black;"
-        #                                  "background : white;"
-        #                                  "}")
-        # self.labelEndVal.setText("100")
-        # self.row_1_2.addWidget(self.labelEndVal, 1)
-        # self.row_1_2.addWidget(push_clear_ranges)
+        # creating a open bracket button
+        push_open_bracket = QPushButton("(", self)
+        # creating a close bracket button
+        push_close_bracket = QPushButton(")", self)
+        # creating a power button
+        push_pow = QPushButton("pow", self)
+        # creating a sqrt button
+        push_comma = QPushButton(",", self)
+
 
         self.row_1.addWidget(push_clear)
         self.row_1.addWidget(push_del)
@@ -242,6 +219,11 @@ class MainWindow(QMainWindow):
         self.row_5.addWidget(push_div)
         self.row_5.addWidget(push_x)
 
+        self.row_6.addWidget(push_open_bracket)
+        self.row_6.addWidget(push_close_bracket)
+        self.row_6.addWidget(push_pow)
+        self.row_6.addWidget(push_comma)
+
         # adding action to each of the button
         push_minus.clicked.connect(self.action_minus)
         push_x.clicked.connect(self.action_x)
@@ -260,15 +242,17 @@ class MainWindow(QMainWindow):
         push_plus.clicked.connect(self.action_plus)
         push_point.clicked.connect(self.action_point)
         push_clear.clicked.connect(self.action_clear)
-        #push_clear_ranges.clicked.connect(self.action_clear_ranges)
         push_del.clicked.connect(self.action_del)
         pushDraw.clicked.connect(self.action_draw)
+
+        push_open_bracket.clicked.connect(self.action_open_bracket)
+        push_close_bracket.clicked.connect(self.action_close_bracket)
+        push_pow.clicked.connect(self.action_pow)
+        push_comma.clicked.connect(self.action_comma)
 
     def action_draw(self):
         # get the label text
         equation = self.label.text()
-        # startRange = self.labelStartVal.text()
-        # endRange = self.labelEndVal.text()
 
         try:
             self.UiPlot(equation, self.x0, self.x1)
@@ -285,6 +269,26 @@ class MainWindow(QMainWindow):
         # appending label text
         text = self.label.text()
         self.label.setText(text + "x")
+
+    def action_open_bracket(self):
+        # appending label text
+        text = self.label.text()
+        self.label.setText(text + "(")
+
+    def action_close_bracket(self):
+        # appending label text
+        text = self.label.text()
+        self.label.setText(text + ")")
+
+    def action_pow(self):
+        # appending label text
+        text = self.label.text()
+        self.label.setText(text + "pow(")
+
+    def action_comma(self):
+        # appending label text
+        text = self.label.text()
+        self.label.setText(text + ",")
 
     def action_plus(self):
         # appending label text
@@ -365,11 +369,6 @@ class MainWindow(QMainWindow):
         # clearing the label text
         self.label.setText("")
 
-    # def action_clear_ranges(self):
-    #     # clearing the label text
-    #     self.labelStartVal.setText("")
-    #     self.labelEndVal.setText("")
-
     def action_del(self):
         # clearing a single digit
         text = self.label.text()
@@ -386,7 +385,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = MainWindow()
-
 
     window.show()
 
