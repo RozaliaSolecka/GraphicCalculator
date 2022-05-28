@@ -1,5 +1,4 @@
 import sys
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -7,10 +6,8 @@ from PyQt5 import QtGui
 
 import pyqtgraph as pg
 from frange import drange
-import sympy as sp
 
 class MainWindow(QMainWindow):
-
     def __init__(self):
         super().__init__()
 
@@ -55,7 +52,6 @@ class MainWindow(QMainWindow):
         widget.setLayout(self.pagelayout)
         self.setCentralWidget(widget)
 
-
         self.plt = pg.PlotWidget()
         self.x = []
         self.y = []
@@ -85,11 +81,8 @@ class MainWindow(QMainWindow):
             equation = self.label.text()
 
             if equation != '':
-                self.UiPlot(equation, self.x0, self.x1)
+                self.action_draw()
             self.init_x = True
-
-    # def checkifcontinus(self, func, x, symbol):
-    #     return (sp.limit(func, symbol, x).is_real)
 
     def UiPlot(self, equation, range_start, range_end):
 
@@ -117,7 +110,6 @@ class MainWindow(QMainWindow):
             self.label.setText("Błąd")
 
     # method for widgets
-
     def UiComponents(self):
 
         # f(x) label
@@ -189,7 +181,6 @@ class MainWindow(QMainWindow):
         push_clear = QPushButton("Wyczyść", self)
         # del one character button
         push_del = QPushButton("Usuń", self)
-
         # creating a open bracket button
         push_open_bracket = QPushButton("(", self)
         # creating a close bracket button
@@ -198,7 +189,6 @@ class MainWindow(QMainWindow):
         push_pow = QPushButton("pow", self)
         # creating a sqrt button
         push_comma = QPushButton(",", self)
-
 
         self.row_1.addWidget(push_clear)
         self.row_1.addWidget(push_del)
@@ -218,7 +208,6 @@ class MainWindow(QMainWindow):
         self.row_5.addWidget(push_point)
         self.row_5.addWidget(push_div)
         self.row_5.addWidget(push_x)
-
         self.row_6.addWidget(push_open_bracket)
         self.row_6.addWidget(push_close_bracket)
         self.row_6.addWidget(push_pow)
@@ -244,7 +233,6 @@ class MainWindow(QMainWindow):
         push_clear.clicked.connect(self.action_clear)
         push_del.clicked.connect(self.action_del)
         pushDraw.clicked.connect(self.action_draw)
-
         push_open_bracket.clicked.connect(self.action_open_bracket)
         push_close_bracket.clicked.connect(self.action_close_bracket)
         push_pow.clicked.connect(self.action_pow)
@@ -367,6 +355,7 @@ class MainWindow(QMainWindow):
 
     def action_clear(self):
         # clearing the label text
+        self.plt.clear()
         self.label.setText("")
 
     def action_del(self):
@@ -380,12 +369,8 @@ class MainWindow(QMainWindow):
                "przez użytkownika. Liczba operacji możliwych do wykonania jest ograniczona."
         QMessageBox.about(self, "Informacje", text)
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
     window = MainWindow()
-
     window.show()
-
     app.exec()
