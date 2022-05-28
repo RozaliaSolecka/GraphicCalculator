@@ -1,14 +1,10 @@
 import gi
-
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
 from matplotlib.backends.backend_gtk3agg import (
     FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.figure import Figure
 import numpy as np
-
-
 
 class DialogExample(Gtk.Dialog):
     def __init__(self, parent):
@@ -24,7 +20,6 @@ class DialogExample(Gtk.Dialog):
         box.add(label)
         self.show_all()
 
-
 class Window(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
@@ -33,8 +28,8 @@ class Window(Gtk.Window):
 
         self.set_icon_from_file("calculator.png")
 
-        self.x0 = -20
-        self.x1 = 21
+        self.x0 = -20.001
+        self.x1 = 20.001
 
         # menu
         mb = Gtk.MenuBar()
@@ -58,7 +53,27 @@ class Window(Gtk.Window):
         self.graph_box = Gtk.Box(spacing=6)
         self.initial_plot()
 
+        # Set up the right column with tools for graph
+        self.rcolumn = Gtk.VBox(spacing=0)
+        self.rcolumn.set_spacing(10)
+        self.graph_box.pack_end(self.rcolumn, False, False, 20)
 
+        # Set up zoom button
+        self.zoom_button = Gtk.Button(label='bliżej')
+        self.zoom_button.connect('clicked', self.push_zoom_action)
+        self.rcolumn.add(self.zoom_button)
+
+        self.unzoom_button = Gtk.Button(label='dalej')
+        self.unzoom_button.connect('clicked', self.push_unzoom_action)
+        self.rcolumn.add(self.unzoom_button)
+
+        self.move_right_button = Gtk.Button(label='prawo')
+        self.move_right_button.connect('clicked', self.move_right_action)
+        self.rcolumn.add(self.move_right_button)
+
+        self.move_left_button = Gtk.Button(label='lewo')
+        self.move_left_button.connect('clicked', self.move_left_action)
+        self.rcolumn.add(self.move_left_button)
 
         # buttons
         self.button_box = Gtk.VBox(spacing=6)
@@ -73,18 +88,13 @@ class Window(Gtk.Window):
         self.graph_box.pack_start(self.canvas, True, True, 0)
         self.vbox.pack_start(self.graph_box, True, True, 0)
         self.ax = self.fig.add_subplot()
+        self.ax.grid()
         self.draw_plot()
 
-
-
-
     def UiPlot(self, equation, range_start, range_end):
-
         self.ax.clear()
-
-        self.x = list(range(range_start, range_end))
+        self.x = np.arange(range_start, range_end, 0.1)
         self.y = []
-
 
         for i in self.x:
             result = eval(equation, {"x": i})
@@ -93,11 +103,9 @@ class Window(Gtk.Window):
         print(self.y)
 
         self.ax.plot(self.x, self.y)
-
-
+        self.ax.grid()
 
     def UiComponenets(self):
-
         # label
         self.row_0 = Gtk.Box(spacing=6)
 
@@ -108,9 +116,8 @@ class Window(Gtk.Window):
         self.label.set_justify(Gtk.Justification.LEFT)
         self.row_0.pack_start(self.label, True, True, 0)
 
-        self.push_draw = Gtk.Button(label="Rysuj")
-
-        self.row_0.pack_start(self.push_draw, False, False, 0)
+        self.push_draw = Gtk.Button(label=" Rysuj ")
+        self.row_0.pack_start(self.push_draw, False, False, 20)
 
         # buttons
         self.row_1 = Gtk.Box(spacing=6)
@@ -207,12 +214,45 @@ class Window(Gtk.Window):
             self.UiPlot(equation, self.x0, self.x1)
             self.draw_plot()
         except:
+            self.ax.clear()
+            self.ax.grid()
+            self.draw_plot()
             self.label.set_text("Błąd")
 
+    def push_zoom_action(self, widget):
+        if abs(self.x1 - self.x0) >= 10:
+            equation = self.label.get_text()
+            if equation != '':
+                self.x0 += 2
+                self.x1 -= 2
+                self.push_draw_action(widget)
+                self.draw_plot()
 
+    def push_unzoom_action(self, widget):
+        equation = self.label.get_text()
+        if equation != '':
+            self.x0 -= 2
+            self.x1 += 2
+            self.push_draw_action(widget)
+            self.draw_plot()
+
+    def move_right_action(self, widget):
+        equation = self.label.get_text()
+        if equation != '':
+            self.x0 += 2
+            self.x1 += 2
+            self.push_draw_action(widget)
+            self.draw_plot()
+
+    def move_left_action(self, widget):
+        equation = self.label.get_text()
+        if equation != '':
+            self.x0 -= 2
+            self.x1 -= 2
+            self.push_draw_action(widget)
+            self.draw_plot()
 
     def draw_plot(self) -> None:
-        """ Draw or update the current plot """
         self.fig.canvas.draw()
 
     def push_1_action(self, widget):
@@ -276,6 +316,11 @@ class Window(Gtk.Window):
         self.label.set_text(text + ".")
 
     def push_clear_action(self, widget):
+        self.x0 = -20.001
+        self.x1 = 20.001
+        self.ax.clear()
+        self.ax.grid()
+        self.draw_plot()
         self.label.set_text("")
 
     def push_del_action(self, widget):
@@ -302,12 +347,9 @@ class Window(Gtk.Window):
         text = self.label.get_text()
         self.label.set_text(text + ",")
 
-
-
     def on_pop_menu(self, widget, event):
         dialog = DialogExample(self)
         dialog.run()
-
         dialog.destroy()
 
 if __name__ == "__main__":
